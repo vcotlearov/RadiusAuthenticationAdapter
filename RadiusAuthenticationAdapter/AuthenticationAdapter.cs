@@ -27,8 +27,6 @@ namespace RadiusAuthenticationAdapter
             // This is needed so we can access the UPN in TryEndAuthentication().
             this.identityClaim = identityClaim.Value;
 
-            context.Data.Add("userid", this.identityClaim);
-
             return new AdapterPresentation();
         }
 
@@ -133,7 +131,7 @@ namespace RadiusAuthenticationAdapter
                 throw new ExternalAuthenticationException(resMgr.GetString("Error_InvalidPIN", new System.Globalization.CultureInfo(context.Lcid)), context);
             }
             string pin = proofData.Properties["pin"].ToString();
-            string userName = (string)context.Data["userid"];
+            string userName = this.identityClaim;
 
             // Construct RADIUS auth request.
             var authPacket = radiusClient.Authenticate(userName, pin);
@@ -178,7 +176,7 @@ namespace RadiusAuthenticationAdapter
                 Logging.LogMessage(
                     "Processed authentication response." + Environment.NewLine +
                     "Packet Type: " + receivedPacket.PacketType.ToString() + Environment.NewLine +
-                    "User: " + userName);
+                    "User: " + this.identityClaim );
             }
 
             return result;
